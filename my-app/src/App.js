@@ -15,7 +15,9 @@ function App() {
         {data.map(question => {
           return (<li key={question.id}>
             <QuestionCard
-              questionText={question.questionText} 
+              questionId={question.id}
+              questionText={question.questionText}
+              questionType={question.type} 
               answers={question.answers}/>
           </li>)
         })}
