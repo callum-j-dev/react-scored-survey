@@ -1,18 +1,15 @@
-import { use, useState } from 'react';
-
-
-export default function QuestionCard({ questionId, questionText, questionType, answers}) {
-    const [selected, setSelected] = useState([]);
-
-    const selectedAnswers = answers.filter(answer => {
-        return selected.includes(answer.id);
-    });
+export default function QuestionCard({ categoryId, questionId, questionText, questionType, questionScoreData, answers, handleScoreUpdate}) {
+    
+    const selectedAnswers = questionScoreData.selectedAnswers;
+    const selected = selectedAnswers.map(ans => ans.id)
 
     const score = selectedAnswers.reduce((total, answer) => {
         return total + answer.score;
     }, 0);
 
     // TODO Lift state so total score can be displayed
+    // Question score will get passed in as a prop, updated by parent state via the handleScoreUpdate function
+    
 
     if (questionType === 'single') { // radio button, accepts only one answer
         return (
@@ -22,14 +19,14 @@ export default function QuestionCard({ questionId, questionText, questionType, a
                     {answers.map(answer => {
                         return (
                             <li key={answer.id}>
-                                <input type="radio" id={answer.id} value={answer.score} checked={selected.includes(answer.id)} onClick={e => {
+                                <input type="radio" id={answer.id} value={answer.score} checked={selected.includes(answer.id)} onChange={e => {
                                     if (selected.includes(answer.id)) {
                                         // Do nothing, already selected
                                     } else {
-                                        setSelected([answer.id]);
+                                        handleScoreUpdate(categoryId, questionId, questionType, answer.id, answer.score);
                                     }
                                 }}/>
-                                <label for={answer.id}>{answer.answerText}</label>
+                                <label htmlFor={answer.id}>{answer.answerText}</label>
                             </li>
                         )
                     })}
@@ -45,14 +42,10 @@ export default function QuestionCard({ questionId, questionText, questionType, a
                     {answers.map(answer => {
                         return (
                             <li key={answer.id}>
-                                <input type="checkbox" id={answer.id} value={answer.score} checked={selected.includes(answer.id)} onClick={e => {
-                                    if (selected.includes(answer.id)) {
-                                        setSelected(selected.filter(a => a !== answer.id));
-                                    } else {
-                                        setSelected([...selected, answer.id]); 
-                                    }
+                                <input type="checkbox" id={answer.id} value={answer.score} checked={selected.includes(answer.id)} onChange={e => {
+                                    handleScoreUpdate(categoryId, questionId, questionType, answer.id, answer.score)
                                 }} />
-                                <label for={answer.id}>{answer.answerText}</label>
+                                <label htmlFor={answer.id}>{answer.answerText}</label>
                             </li>
                         )
                     })}
