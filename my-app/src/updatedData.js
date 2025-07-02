@@ -12,16 +12,19 @@ export const updatedData = [
           {
             id: "0-0-0",
             answerText: 'Answer a, 1pt',
+            hasTextField: true,
             score: 1
           },
           {
             id: "0-0-1",
             answerText: 'Answer b, 2pt',
+            hasTextField: false,
             score: 2
           },
           {
             id: "0-0-2",
             answerText: 'Answer c, 3pt',
+            hasTextField: false,
             score: 3
           }
         ]
@@ -34,17 +37,33 @@ export const updatedData = [
           {
             id: "0-1-0",
             answerText: 'Answer a, 1pt',
+            hasTextField: false,
             score: 1
           },
           {
             id: "0-1-1",
             answerText: 'Answer b, 2pt',
+            hasTextField: false,
             score: 2
           },
           {
             id: "0-1-2",
             answerText: 'Answer c, 3pt',
+            hasTextField: false,
             score: 3
+          }
+        ]
+      },
+      {
+        id: '0-2',
+        questionText: 'Question 3',
+        type: 'text',
+        answers: [
+          {
+            id: '0-2-0',
+            answerText: '',
+            hasTextField: true,
+            score: 0
           }
         ]
       }
@@ -66,20 +85,24 @@ export const updatedData = [
         id: '1-0',
         questionText: 'Question 1',
         type: 'single',
+        
         answers: [
           {
             id: "1-0-0",
             answerText: 'Answer a, 1pt',
+            hasTextField: false,
             score: 1
           },
           {
             id: "1-0-1",
             answerText: 'Answer b, 2pt',
+            hasTextField: false,
             score: 2
           },
           {
             id: "1-0-2",
             answerText: 'Answer c, 3pt',
+            hasTextField: false,
             score: 3
           }
         ]
@@ -92,16 +115,19 @@ export const updatedData = [
           {
             id: "1-1-0",
             answerText: 'Answer a, 1pt',
+            hasTextField: false,
             score: 1
           },
           {
             id: "1-1-1",
             answerText: 'Answer b, 2pt',
+            hasTextField: false,
             score: 2
           },
           {
             id: "1-1-2",
             answerText: 'Answer c, 3pt',
+            hasTextField: false,
             score: 3
           }
         ]

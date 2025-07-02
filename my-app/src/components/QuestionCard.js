@@ -23,7 +23,7 @@ export default function QuestionCard({ categoryId, questionId, questionText, que
                     {answers.map(answer => {
                         return (
                             <li key={answer.id}>
-                                <input className="answer" type="radio" id={answer.id} value={answer.score} checked={selected.includes(answer.id)} onChange={e => {
+                                <input className="answer" type="radio" id={answer.id} name={answer.id} value={answer.score} checked={selected.includes(answer.id)} onChange={e => {
                                     if (selected.includes(answer.id)) {
                                         // Do nothing, already selected
                                     } else {
@@ -31,10 +31,21 @@ export default function QuestionCard({ categoryId, questionId, questionText, que
                                     }
                                 }}/>
                                 <label htmlFor={answer.id}>{answer.answerText}</label>
+                                {answer.hasTextField &&
+                                    <input type="text" id={answer.id + "text"} name={answer.id + "text"} disabled={!selected.includes(answer.id)}></input>
+                                }
                             </li>
                         )
                     })}
                 </ul>
+            </div>
+        )
+    } else if (questionType === 'text') {
+        const answer = answers[0];
+        
+        return (
+            <div className="question-card">
+                <p>{questionText}: <input type="text" id={answer.id + "text"} name={answer.id + "text"} /></p>
             </div>
         )
     } else {    // accepts multiple answers
@@ -45,7 +56,7 @@ export default function QuestionCard({ categoryId, questionId, questionText, que
                     {answers.map(answer => {
                         return (
                             <li key={answer.id}>
-                                <input className="answer" type="checkbox" id={answer.id} value={answer.score} checked={selected.includes(answer.id)} onChange={e => {
+                                <input className="answer" type="checkbox" id={answer.id} name={answer.id} value={answer.score} checked={selected.includes(answer.id)} onChange={e => {
                                     handleScoreUpdate(categoryId, questionId, questionType, answer.id, answer.score)
                                 }} />
                                 <label htmlFor={answer.id}>{answer.answerText}</label>
