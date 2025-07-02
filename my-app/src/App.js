@@ -24,7 +24,8 @@ function setupInitialStateArray() {
       }
     )
   });
-
+  console.log('Initial state:')
+  console.log(stateArray);
   return stateArray;
 }
 
@@ -36,9 +37,15 @@ function App() {
   const [scores, setScores] = useState(setupInitialStateArray());
 
   // const categoryScores = [];
+  //console.log(scores);
+
   console.log(scores);
 
   const categoryScores = scores.map(category => {
+    console.log('Updating category scores' + category.id);
+    console.log(category);
+    console.log(category.questionScores);
+
     const totalCategoryScore = category.questionScores.reduce((total, current) => {
       const totalQuestionScore = current.selectedAnswers.reduce((aTotal, aCurrent) => {
         return aTotal + aCurrent.score;
@@ -60,6 +67,8 @@ function App() {
   }, 0);
 
   const handleScoreUpdate = (categoryId, questionId, questionType, answerId, answerScore) => {
+    console.log('Updating score')
+    
     const categoryScoreData = scores.find(cat => cat.id === categoryId);
     const questionScoreData = categoryScoreData.questionScores.find(q => q.id === questionId);
     const selectedAnswers = questionScoreData.selectedAnswers;
@@ -68,7 +77,7 @@ function App() {
     let newSelectedAnswers = [];
 
     if (questionType === 'single') {
-      newSelectedAnswers = [{answerId, answerScore}];
+      newSelectedAnswers = [{id: answerId, score: answerScore}];
     } else {  // Question type multi
       if (selectedIds.includes(answerId)) {
         newSelectedAnswers = selectedAnswers.filter(ans => ans.id !== answerId);
@@ -76,6 +85,11 @@ function App() {
         newSelectedAnswers = [...selectedAnswers, { id: answerId, score: answerScore }];
       }
     }
+    console.log('New selectedAnswsers:')
+    console.log(newSelectedAnswers);
+
+
+    // Somehow, the scores category objects are losing the questionScores property
 
     const newCategoryScoreData = categoryScoreData.questionScores.map(question => {
       if (question.id === questionId) {
@@ -88,6 +102,7 @@ function App() {
       }
     });
 
+    console.log('New categoryScoreData:')
     console.log(newCategoryScoreData);
 
     const newScoreData = scores.map(cat => {
@@ -101,8 +116,9 @@ function App() {
       }
     });
 
-    setScores(newCategoryScoreData);
-
+    console.log('Setting new scores')
+    setScores(newScoreData);
+    console.log('New scores set')
 
     
   //   setScores(scores.map(category => {
@@ -187,6 +203,7 @@ function App() {
           )
         })}
       </ul>
+      <b>Total Score: {totalScore}</b>
     </div>
   )
   // return (

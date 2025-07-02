@@ -1,3 +1,11 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  padding: 2rem;
+}
+
 .App {
   text-align: center;
 }
@@ -37,6 +45,51 @@
   }
 }
 
+h2, h3 {
+  margin: 0;
+}
+
 ul {
   list-style-type: none;
+}
+
+.title-bar {
+  max-width: 75%;
+  display: flex;
+  justify-content: space-between;
+  background: navy;
+  color: white;
+  padding: 0.5rem;
+}
+
+.category-container {
+  display: flex;
+  justify-content: space-evenly;
+  max-width: 75%;
+}
+
+.blurb {
+  background: lightblue;
+  width: 100%;
+}
+
+.question-container {
+  width: 100%;
+  margin-bottom: 2rem;
+  padding: 1rem;
+}
+
+.question-card {
+  padding: 0.5rem;
+}
+
+.score-box {
+  padding: 0.25rem;
+  background: white;
+  color: black;
+  border: 5px solid green;
+}
+
+.answer {
+  margin: 0.5rem;
 }

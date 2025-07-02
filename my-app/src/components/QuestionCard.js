@@ -1,9 +1,13 @@
 export default function QuestionCard({ categoryId, questionId, questionText, questionType, questionScoreData, answers, handleScoreUpdate}) {
     
     const selectedAnswers = questionScoreData.selectedAnswers;
+    console.log('Selected Answers:')
+    console.log(selectedAnswers);
     const selected = selectedAnswers.map(ans => ans.id)
 
     const score = selectedAnswers.reduce((total, answer) => {
+        console.log('Total ' + total);
+        console.log('Current ' + answer.score);
         return total + answer.score;
     }, 0);
 
@@ -13,13 +17,13 @@ export default function QuestionCard({ categoryId, questionId, questionText, que
 
     if (questionType === 'single') { // radio button, accepts only one answer
         return (
-            <div>
+            <div className="question-card">
                 <h2>{questionText}</h2>
                 <ul>
                     {answers.map(answer => {
                         return (
                             <li key={answer.id}>
-                                <input type="radio" id={answer.id} value={answer.score} checked={selected.includes(answer.id)} onChange={e => {
+                                <input className="answer" type="radio" id={answer.id} value={answer.score} checked={selected.includes(answer.id)} onChange={e => {
                                     if (selected.includes(answer.id)) {
                                         // Do nothing, already selected
                                     } else {
@@ -31,18 +35,17 @@ export default function QuestionCard({ categoryId, questionId, questionText, que
                         )
                     })}
                 </ul>
-                <span>{score}</span>
             </div>
         )
     } else {    // accepts multiple answers
         return (
-            <div>
+            <div className="question-card">
                 <h2>{questionText}</h2>
                 <ul>
                     {answers.map(answer => {
                         return (
                             <li key={answer.id}>
-                                <input type="checkbox" id={answer.id} value={answer.score} checked={selected.includes(answer.id)} onChange={e => {
+                                <input className="answer" type="checkbox" id={answer.id} value={answer.score} checked={selected.includes(answer.id)} onChange={e => {
                                     handleScoreUpdate(categoryId, questionId, questionType, answer.id, answer.score)
                                 }} />
                                 <label htmlFor={answer.id}>{answer.answerText}</label>
@@ -50,7 +53,6 @@ export default function QuestionCard({ categoryId, questionId, questionText, que
                         )
                     })}
                 </ul>
-                <span>{score}</span>
             </div>
         )
     }
