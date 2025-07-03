@@ -322,6 +322,7 @@ function App() {
                   categoryScoreData={scores.find(cat => cat.id === category.id)}
                   handleScoreUpdate={handleScoreUpdate}
                   handleText={handleText}
+                  additionalText={category.additionalText}
                 />
               </li>
             )

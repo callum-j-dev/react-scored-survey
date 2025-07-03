@@ -35,7 +35,8 @@ export const specificData = [
       "Reduces risk of password related vulnerabilities.",
       "Simplifies access management.",
       "Minimizes the attack surface associated with multiple login credentials."
-    ]
+    ],
+    additionalText: ''
   },
   {
     id: 'acm',
@@ -90,7 +91,8 @@ export const specificData = [
       "Restricting access to critical information and admin privileges only to those who need it reduces the potential impact of a compromised account.",
       "This practice helps maintain data confidentiality and integrity.",
       "Major security frameworks like NIST 800-53, NIST CSF, ISO 27001 and HIPAA require access controls based on principles like least privilege, need to know, and zero trust to protect sensitive systems and data."
-    ]
+    ],
+    additionalText: "SCORE: 3 of 3 (8), 1-2 (3), 0 (0)"
   },
   {
     id: 'pvm',
@@ -176,7 +178,8 @@ export const specificData = [
       "Prompt patching closes known vulnerabilities, minimizing the entry points attackers can exploit.",
       "Prevents Exploitation of Known Threats: Applying patches quickly prevents attackers from using publicly disclosed vulnerabilities to breach systems.",
       "Protects Sensitive Data: Effective vulnerability management safeguards critical data by addressing weaknesses before they can be targeted."
-    ]
+    ],
+    additionalText: "*Businesses with just one unresolved critical vulnerability are 33% more likely to experience a security incident than those that address the vulnerability (Source: Coalition 2025 Cyber Claims Report)."
   }
 ]
 

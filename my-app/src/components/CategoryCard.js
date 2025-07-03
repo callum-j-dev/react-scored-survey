@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import QuestionCard from './QuestionCard';
 
-export default function CategoryCard({ categoryId, categoryName, categoryAbbreviation, categoryScore, blurbBullets, questions, categoryScoreData, handleScoreUpdate, handleText}) {
+export default function CategoryCard({ categoryId, categoryName, categoryAbbreviation, categoryScore, blurbBullets, questions, categoryScoreData, handleScoreUpdate, handleText, additionalText}) {
 
     return (
         <div>
@@ -39,6 +39,7 @@ export default function CategoryCard({ categoryId, categoryName, categoryAbbrevi
                             </li>
                         )
                     })}
+                    {additionalText.length > 0 && <li key={categoryId + '-additional-text'}><p>{additionalText}</p></li>}
                 </ul>
             </div>
             
