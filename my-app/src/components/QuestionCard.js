@@ -1,4 +1,4 @@
-export default function QuestionCard({ categoryId, questionId, questionText, questionType, questionScoreData, answers, handleScoreUpdate}) {
+export default function QuestionCard({ categoryId, questionId, questionText, questionType, questionScoreData, answers, handleScoreUpdate, handleText}) {
     
     const selectedAnswers = questionScoreData.selectedAnswers;
     console.log('Selected Answers:')
@@ -27,12 +27,14 @@ export default function QuestionCard({ categoryId, questionId, questionText, que
                                     if (selected.includes(answer.id)) {
                                         // Do nothing, already selected
                                     } else {
-                                        handleScoreUpdate(categoryId, questionId, questionType, answer.id, answer.score);
+                                        handleScoreUpdate(categoryId, questionId, questionType, answer.id, answer.score, answer.hasTextField);
                                     }
                                 }}/>
-                                <label htmlFor={answer.id}>{answer.answerText}</label>
+                                <label htmlFor={answer.id}>{answer.answerText + ': '}</label>
                                 {answer.hasTextField &&
-                                    <input type="text" id={answer.id + "text"} name={answer.id + "text"} disabled={!selected.includes(answer.id)}></input>
+                                    <input type="text" id={answer.id + "-text"} name={answer.id + "-text"} disabled={!selected.includes(answer.id)} onChange={e => {
+                                        handleText(questionId, answer.id, answer.id + "-text", e.target.value)
+                                    }} ></input>
                                 }
                             </li>
                         )
@@ -45,7 +47,7 @@ export default function QuestionCard({ categoryId, questionId, questionText, que
         
         return (
             <div className="question-card">
-                <p>{questionText}: <input type="text" id={answer.id + "text"} name={answer.id + "text"} /></p>
+                <p>{questionText}: <input type="text" id={answer.id + "-text"} name={answer.id + "-text"} onChange={e => {handleText(questionId, answer.id, answer.id + "-text", e.target.value)}} /></p>
             </div>
         )
     } else {    // accepts multiple answers

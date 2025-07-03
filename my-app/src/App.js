@@ -24,28 +24,51 @@ function setupInitialStateArray() {
       }
     )
   });
+
+  
   console.log('Initial state:')
   console.log(stateArray);
   return stateArray;
 }
 
-function extractQuestionScoreData(categoryScoreData) {
+function setupInitialInputs() {
+    const inputsArray = [];
+    updatedData.forEach(category => {
+      category.questions.forEach(question => {
+        inputsArray.push({id: question.id, questionData: []});
+      })
+    });
 
-}
+    return inputsArray;
+  }
+
+  function setupInitialTextFields() {
+    let textFields = [];
+
+    updatedData.forEach(category => {
+      category.questions.forEach(question => {
+        question.answers.forEach(answer => {
+          if (answer.hasTextField) {
+            textFields.push({answerId: answer.id, textId: answer.id + "-text", value:""})
+          }
+        })
+      })
+    });
+
+    return textFields;
+  }
 
 function App() {
   const [scores, setScores] = useState(setupInitialStateArray());
-
-  // const categoryScores = [];
-  //console.log(scores);
-
-  console.log(scores);
+  const [inputs, setInputs] = useState(setupInitialInputs());
+  const [textFields, setTextFields] = useState(setupInitialTextFields())
+  
+  console.log("fresh render inputs");
+  console.log(inputs);
+  console.log("fresh render text fields");
+  console.log(textFields);
 
   const categoryScores = scores.map(category => {
-    console.log('Updating category scores' + category.id);
-    console.log(category);
-    console.log(category.questionScores);
-
     const totalCategoryScore = category.questionScores.reduce((total, current) => {
       const totalQuestionScore = current.selectedAnswers.reduce((aTotal, aCurrent) => {
         return aTotal + aCurrent.score;
@@ -66,30 +89,40 @@ function App() {
     return total + current.score;
   }, 0);
 
-  const handleScoreUpdate = (categoryId, questionId, questionType, answerId, answerScore) => {
-    console.log('Updating score')
-    
+  const handleScoreUpdate = (categoryId, questionId, questionType, answerId, answerScore, answerHasText) => {
     const categoryScoreData = scores.find(cat => cat.id === categoryId);
     const questionScoreData = categoryScoreData.questionScores.find(q => q.id === questionId);
     const selectedAnswers = questionScoreData.selectedAnswers;
+    const questionInputs = inputs.find(input => input.id === questionId).questionData;
     const selectedIds = selectedAnswers.map(ans => ans.id);
 
+    console.log('Current text fields');
+    console.log(textFields)
+
     let newSelectedAnswers = [];
+    let newQuestionInputs = [];
 
     if (questionType === 'single') {
       newSelectedAnswers = [{id: answerId, score: answerScore}];
+
+      if (answerHasText) {
+        const existingTextField = textFields.find(textField => textField.answerId === answerId).value;
+        
+        newQuestionInputs = [{id: answerId, value: answerScore}, {id: answerId + "-text", value: existingTextField}];
+
+      } else {
+        newQuestionInputs = [{id: answerId, value: answerScore}];
+      }
+      
     } else {  // Question type multi
       if (selectedIds.includes(answerId)) {
         newSelectedAnswers = selectedAnswers.filter(ans => ans.id !== answerId);
+        newQuestionInputs = questionInputs.filter(ans => ans.id !== answerId);
       } else {
         newSelectedAnswers = [...selectedAnswers, { id: answerId, score: answerScore }];
+        newQuestionInputs = [...questionInputs, { id: answerId, value: answerScore }];
       }
     }
-    console.log('New selectedAnswsers:')
-    console.log(newSelectedAnswers);
-
-
-    // Somehow, the scores category objects are losing the questionScores property
 
     const newCategoryScoreData = categoryScoreData.questionScores.map(question => {
       if (question.id === questionId) {
@@ -102,9 +135,6 @@ function App() {
       }
     });
 
-    console.log('New categoryScoreData:')
-    console.log(newCategoryScoreData);
-
     const newScoreData = scores.map(cat => {
       if (cat.id === categoryId) {
         return {
@@ -116,94 +146,139 @@ function App() {
       }
     });
 
-    console.log('Setting new scores')
+    const newInputs = inputs.map(input => {
+      if (input.id === questionId) {
+        return {
+          ...input,
+          questionData: newQuestionInputs
+        };
+      } else {
+        return input;
+      }
+    })
+
+    console.log('Current inputs');
+    console.log(inputs);
+
     setScores(newScoreData);
-    console.log('New scores set')
-
-    
-  //   setScores(scores.map(category => {
-  //     if (category.id === categoryId) {
-  //       let updatedQuestions = category.questionScores.map(q => {
-  //         if (q.id === questionId) {
-  //           if (questionType === 'single') {
-  //             return {
-  //               ...q,
-  //               selectedAnswers: [{answerId, answerScore}]
-  //             }
-  //           } else { // question type is multi
-  //             if (q.selectedAnswers.some(ans => ans.id === answerId)) { // Answer is already checked, -> unchecking
-  //               return {
-  //                 ...q,
-  //                 selectedAnswers: [q.selectedAnswsers.filter(a => a.id !== answerId)]
-  //               }
-  //             } else {
-  //               return {
-  //                 ...q,
-  //                 selectedAnswers: [...q.selectedAnswers, {answerId, answerScore}]
-  //               }
-  //             }
-  //           }
-  //         } else {
-  //           return q;
-  //         }
-  //       });
-
-  //       return (
-  //         {
-  //           id: categoryId,
-  //           questionScores: updatedQuestions
-  //         }
-  //       )
-  //     } else {
-  //       return category;
-  //     }
-  //   }));
+    setInputs(newInputs);
   }
 
+  const handleText = (questionId, answerId, textId, inputText) => {
+    console.log(inputs);
+    console.log(questionId);
 
+    const questionInputs = inputs.find(input => input.id === questionId).questionData;
+    let newQuestionInputs = [];
 
-  // const handleScoreUpdate = (questionId, questionScore) => {
-  //   if (questionScores.some(q => q.id === questionId)) {
-  //     setQuestionScores(questionScores.map(qs => {
-  //       if (qs.id === questionId) {
-  //         return ({
-  //           ...qs,
-  //           score: questionScore
-  //         });
-  //       } else {
-  //         return qs;
-  //       }
-  //     }));
-  //   } else {
-  //     setQuestionScores([...questionScores, 
-  //       {
-  //         id: questionId,
-  //         score: questionScore
-  //       }]);
-  //   }
-  // }
+    // console.log('question inputs')
+    // console.log(questionInputs);
+    console.log('Current text fields');
+    console.log(textFields);
+
+    if (questionInputs.some(input => input.id === textId)) {
+      newQuestionInputs = questionInputs.map(inp => {
+        if (inp.id === textId) {
+          return {id: textId, value: inputText};
+        } else {
+          return inp;
+        }
+      })
+    } else {
+      newQuestionInputs = [...questionInputs, {id: textId, value: inputText}];
+    }
+
+    const newInputs = inputs.map(input => {
+      if (input.id === questionId) {
+        return {
+          ...input,
+          questionData: newQuestionInputs
+        };
+      } else {
+        return input;
+      }
+    });
+
+    const newTextFields = textFields.map(textField => {
+      console.log('Text field Id') ;
+      console.log(textField.answerId);
+      console.log('Answer id')
+      console.log(answerId);
+
+      if (textField.answerId === answerId) {
+        return {
+          ...textField,
+          value: inputText
+        };
+      } else {
+        return textField;
+      }
+    });
+
+    setInputs(newInputs);
+    setTextFields(newTextFields);
+    
+    // if (inputs.some(input => input.id === textId)) {
+    //   setInputs(inputs.map(input => {
+    //     if (input.id === textId) {
+    //       return {id: textId, value: {inputText}};
+    //     } else {
+    //       return input;
+    //     }
+    //   }))
+    // } else {
+    //   setInputs([...inputs, {id: textId, value: inputText}]);
+    // }
+
+  }
+
+  const inputToString = () => {
+    console.log(inputs);
+    let outStr = "";
+    //inputs.forEach(input => outStr += (input.id + ": " + input.value + "\n"));
+    inputs.forEach(question => {
+      question.questionData.forEach(qd => {
+        outStr += (qd.id + ": " + qd.value + "\n");
+      });
+    });
+
+    return outStr;
+  }
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    alert(inputToString());
+  }
+
   return (
     <div className="survey">
-      <h1>Welcome!</h1>
-      <ul>
-        {updatedData.map(category => {
-          return (
-            <li key={category.id}>
-              <CategoryCard
-                categoryId={category.id} 
-                categoryName={category.name}
-                categoryAbbreviation={category.abbreviation}
-                categoryScore={categoryScores.find(cat => cat.id === category.id).score}
-                blurbBullets={category.blurbBullets}
-                questions={category.questions}
-                categoryScoreData={scores.find(cat => cat.id === category.id)}
-                handleScoreUpdate={handleScoreUpdate}
-              />
-            </li>
-          )
-        })}
-      </ul>
-      <b>Total Score: {totalScore}</b>
+      <form onSubmit={handleSubmit}>
+        <h1>Welcome!</h1>
+        <ul>
+          {updatedData.map(category => {
+            return (
+              <li key={category.id}>
+                <CategoryCard
+                  categoryId={category.id} 
+                  categoryName={category.name}
+                  categoryAbbreviation={category.abbreviation}
+                  categoryScore={categoryScores.find(cat => cat.id === category.id).score}
+                  blurbBullets={category.blurbBullets}
+                  questions={category.questions}
+                  categoryScoreData={scores.find(cat => cat.id === category.id)}
+                  handleScoreUpdate={handleScoreUpdate}
+                  handleText={handleText}
+                />
+              </li>
+            )
+          })}
+        </ul>
+        <h3>Total Score: <b className='score-box'>{totalScore}</b></h3>
+        <br></br>
+        <br></br>
+        <input type="submit" />
+      </form>
+      
     </div>
   )
   // return (

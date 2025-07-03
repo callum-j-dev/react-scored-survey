@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import QuestionCard from './QuestionCard';
 
-export default function CategoryCard({ categoryId, categoryName, categoryAbbreviation, categoryScore, blurbBullets, questions, categoryScoreData, handleScoreUpdate}) {
+export default function CategoryCard({ categoryId, categoryName, categoryAbbreviation, categoryScore, blurbBullets, questions, categoryScoreData, handleScoreUpdate, handleText}) {
 
     return (
         <div>
@@ -33,6 +33,7 @@ export default function CategoryCard({ categoryId, categoryName, categoryAbbrevi
                                     questionScoreData={questionScoreData}
                                     answers={question.answers}
                                     handleScoreUpdate={handleScoreUpdate}
+                                    handleText={handleText}
                                 />
                             </li>
                         )
