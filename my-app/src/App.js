@@ -3,16 +3,20 @@ import './App.css';
 import { useState } from 'react';
 import CategoryCard from './components/CategoryCard';
 
-import { data } from './data';
-import { updatedData } from './updatedData';
+// import { data } from './data';
+import { updatedData, specificData } from './updatedData';
+
+const data = specificData; // Adjust to switch back to generic data
 
 function setupInitialStateArray() {
-  const stateArray = updatedData.map(category => {
+  const stateArray = data.map(category => {
     const questionScores = category.questions.map(question => {
       return (
         {
           id: question.id,
-          selectedAnswers: [{id: 'default', score: 0}]
+          type: question.type,
+          selectedAnswers: [],
+          score: 0
         }
       )
     });
@@ -33,7 +37,7 @@ function setupInitialStateArray() {
 
 function setupInitialInputs() {
     const inputsArray = [];
-    updatedData.forEach(category => {
+    data.forEach(category => {
       category.questions.forEach(question => {
         inputsArray.push({id: question.id, questionData: []});
       })
@@ -45,7 +49,7 @@ function setupInitialInputs() {
   function setupInitialTextFields() {
     let textFields = [];
 
-    updatedData.forEach(category => {
+    data.forEach(category => {
       category.questions.forEach(question => {
         question.answers.forEach(answer => {
           if (answer.hasTextField) {
@@ -62,48 +66,86 @@ function App() {
   const [scores, setScores] = useState(setupInitialStateArray());
   const [inputs, setInputs] = useState(setupInitialInputs());
   const [textFields, setTextFields] = useState(setupInitialTextFields())
+
+  console.log('data:');
+  console.log(data);
   
-  console.log("fresh render inputs");
-  console.log(inputs);
-  console.log("fresh render text fields");
-  console.log(textFields);
+  // console.log("fresh render inputs");
+  // console.log(inputs);
+  // console.log("fresh render text fields");
+  // console.log(textFields);
 
   const categoryScores = scores.map(category => {
     const totalCategoryScore = category.questionScores.reduce((total, current) => {
-      const totalQuestionScore = current.selectedAnswers.reduce((aTotal, aCurrent) => {
-        return aTotal + aCurrent.score;
-      }, 0);
+      return total + current.score;
+    }, 0)
 
-      return total + totalQuestionScore
-    },0);
+    return {
+      id: category.id,
+      score: totalCategoryScore
+    }
+  }, 0);
 
-    return (
-      {
-        id: category.id,
-        score: totalCategoryScore
-      }
-    );
-  });
+  console.log('Category scores')
+  console.log(categoryScores);
+
+  // const categoryScores = scores.map(category => {
+  //   const totalCategoryScore = category.questionScores.reduce((total, current) => {
+  //     const totalQuestionScore = current.selectedAnswers.reduce((aTotal, aCurrent) => {
+  //       return aTotal + aCurrent.score;
+  //     }, 0);
+
+  //     return total + totalQuestionScore
+  //   },0);
+
+  //   return (
+  //     {
+  //       id: category.id,
+  //       score: totalCategoryScore
+  //     }
+  //   );
+  // });
 
   const totalScore = categoryScores.reduce((total, current) => {
     return total + current.score;
   }, 0);
 
-  const handleScoreUpdate = (categoryId, questionId, questionType, answerId, answerScore, answerHasText) => {
+  const handleScoreUpdate = (categoryId, questionId, questionType, answerId, answerScore, answerHasText, questionRubric) => {
+    // TODO refactor so that multi answers are scored based on rubric, instead of individual answer scores. Selected answers is now just an array of ids, and questionScoreData now holds a single score value for the question
+    if (questionType === 'multi') {
+      console.log('rubric');
+      console.log(questionRubric);
+    }
+    
+    
+    function scoreByRubric(rubric, numAnswers) {
+      let score = 0;
+      
+      rubric.forEach(level => {
+        if (numAnswers >= level.min && numAnswers <= level.max) {
+          score = level.score;
+        }
+      });
+
+      return score;
+    }
+    
     const categoryScoreData = scores.find(cat => cat.id === categoryId);
     const questionScoreData = categoryScoreData.questionScores.find(q => q.id === questionId);
     const selectedAnswers = questionScoreData.selectedAnswers;
     const questionInputs = inputs.find(input => input.id === questionId).questionData;
-    const selectedIds = selectedAnswers.map(ans => ans.id);
+    //const selectedIds = selectedAnswers.map(ans => ans.id);
 
     console.log('Current text fields');
     console.log(textFields)
 
     let newSelectedAnswers = [];
+    let newScore = 0;
     let newQuestionInputs = [];
 
     if (questionType === 'single') {
-      newSelectedAnswers = [{id: answerId, score: answerScore}];
+      newSelectedAnswers = [answerId];
+      newScore = answerScore;
 
       if (answerHasText) {
         const existingTextField = textFields.find(textField => textField.answerId === answerId).value;
@@ -115,12 +157,21 @@ function App() {
       }
       
     } else {  // Question type multi
-      if (selectedIds.includes(answerId)) {
-        newSelectedAnswers = selectedAnswers.filter(ans => ans.id !== answerId);
+      if (selectedAnswers.includes(answerId)) {
+        newSelectedAnswers = selectedAnswers.filter(ans => ans !== answerId);
+        console.log('scoring rubric, checking');
+        console.log(questionRubric);
+        
+        newScore = scoreByRubric(questionRubric, newSelectedAnswers.length);
         newQuestionInputs = questionInputs.filter(ans => ans.id !== answerId);
       } else {
-        newSelectedAnswers = [...selectedAnswers, { id: answerId, score: answerScore }];
-        newQuestionInputs = [...questionInputs, { id: answerId, value: answerScore }];
+        newSelectedAnswers = [...selectedAnswers, answerId];
+
+        console.log('scoring rubric, unchecking');
+        console.log(questionRubric);
+
+        newScore = scoreByRubric(questionRubric, newSelectedAnswers.length);
+        newQuestionInputs = [...questionInputs, { id: answerId, value: 'checked' }];
       }
     }
 
@@ -128,7 +179,8 @@ function App() {
       if (question.id === questionId) {
         return {
           ...question,
-          selectedAnswers: newSelectedAnswers
+          selectedAnswers: newSelectedAnswers,
+          score: newScore
         }
       } else {
         return question;
@@ -255,7 +307,9 @@ function App() {
       <form onSubmit={handleSubmit}>
         <h1>Welcome!</h1>
         <ul>
-          {updatedData.map(category => {
+          {data.map(category => {
+            console.log('Category:');
+            console.log(category);
             return (
               <li key={category.id}>
                 <CategoryCard

@@ -34,6 +34,7 @@ export default function CategoryCard({ categoryId, categoryName, categoryAbbrevi
                                     answers={question.answers}
                                     handleScoreUpdate={handleScoreUpdate}
                                     handleText={handleText}
+                                    rubric={question.scoringRubric}
                                 />
                             </li>
                         )
